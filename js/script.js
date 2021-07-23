@@ -1,7 +1,7 @@
 // Create global variables to select the following elements:
 
 // The unordered list where the player's guessed letters will appear.
-const guessedLetters = document.querySelector(".guessed_letters");
+const guessedList = document.querySelector(".guessed_letters");
 // The button with the text "Guess!" in it.
 const guessButton = document.querySelector(".guess");
 // The text input where the player will guess a letter.
@@ -19,11 +19,10 @@ const hiddenButton = document.querySelector(".play-again hide");
 // Create another global variable called word and give it the value of "magnolia". 
 // Magnolia is your starting word to test out the game until you fetch words from a hosted file in a later step.
 const word = "magnolia";
-
+// create a new global variable called 'guessedLetters' with an empty array
+const guessedLetters = [];
 
 // Write a Function to Add Placeholders for Each Letter
-// Create and name a function to update the paragraph's innerText for the "words-in-progress" element with circle symbols (●) to represent each letter in the word.
-// The symbols will stay on the screen until the correct letter is guessed (in a future step). Hint: Copy and paste the ● symbol into your code!
 const placeHolder = function (word) {
 	const placeHolderLetters = [];
 	for (const letter of word) {
@@ -31,29 +30,88 @@ const placeHolder = function (word) {
 		placeHolderLetters.push("●");
 	}
 
-// Call the function and pass it the word variable as the argument. You should see 8 circle symbols on the screen, one for each letter in the word "magnolia." 
-// Hint: You'll need to use an array and then join it back to a string using the .join("") method.
+// Use an array and then join it back to a string using the .join("") method.
 wordInProgress.innerText = placeHolderLetters.join("");
+
 };
 
+
+// Call the function and pass it the word variable as the argument.
 placeHolder(word);
 
-// Add an Event Listener for the Button
 
-	guessButton.addEventListener("click", function (e) {
 
-// Add an event listener for when a player clicks the Guess button. In the callback function, add a parameter for the event: e.
-// Because you're working with a form, you want to prevent the default behavior of clicking a button, the form submitting, and then reloading the page.
-// To prevent this reloading behavior, add this line of code at the top of the callback function: e.preventDefault();.
+// Add an Event Listener for when a player clicks the guess Button
+// In the callback function, add a parameter for the event: e.
 	
+	guessButton.addEventListener("click", function (e) {
+// To prevent reloading behavior, add this line of code at the top of the callback function: e.preventDefault();.
 	e.preventDefault();
-
-// Create and name a variable to capture the value of the input. Log out the value of the variable capturing the input.
-// Then, empty the value of the input. You should see the letter you enter into the input field in the console when the Guess button is clicked. 
-
-
+// Empty the text of the message element.
+	message.innerText = "";
+// Create and name a variable to grab the value of the input. 
 	const guess = guessInput.value;
+	// Log out the value of the variable capturing the input.
 	console.log(guess);
+
+// create a variable that saves the successful return of the validateInput function
+const goodGuess = validateInput(guess);
+	console.log(goodGuess);
+
+// Using a conditional statement use the returned value of the validateInput function to call the 
+// makeGuess function that will store the array of correct guesses.
+if (goodGuess) {
+	makeGuess(guess);
+}
+	// Empty the value of the input. You should see the letter you enter into the input field in the console when the Guess button is clicked. 
 	guessInput.value = "";
 
 });
+
+
+
+
+// Create and name a function that accepts the input value as a parameter. This function's purpose is to validate the player's input.
+const validateInput = function (inputValue) {
+// Inside the function, create a variable for the accepted letter sequence, use a regular expression to ensure the player inputs a letter!
+		const acceptedLetter = /[a-zA-Z]/;
+// Still inside the function, use a conditional block to check for different scenarios. First, check if the input is empty.
+		if (inputValue.length === 0) {
+		message.innerText = "You forgot to input a letter, try again";
+		
+// Check if the player has entered more than one letter.
+		} else if (inputValue.length > 1) {
+		message.innerText = "I only need 1 letter at a time please, try again.";
+		
+// Check if they've entered a character that doesn't match the regular expression pattern using the.match() method here.  
+		} else if (!inputValue.match(acceptedLetter)) {
+		message.innerText = "I'm afraid that isn't a letter, please try again."
+	}
+// If all the other conditions aren't met, the input is a letter, which is what you're looking for! Return the input.
+		else {
+		return inputValue;
+	}
+ };
+
+
+
+const makeGuess = function (guess) {
+	// convert the guess to uppercase
+	guess = guess.toUpperCase();
+	// check to see if the array includes the current guessed letter.
+	if (guessedLetters.includes(guess)) {
+		message.innerText = "You've already guessed that letter, try again."
+	} else {
+	// If the guess is good add to the guessletters array
+		guessedLetters.push(guess);
+		console.log(guessedLetters);
+	}
+};
+
+
+
+
+
+
+
+
