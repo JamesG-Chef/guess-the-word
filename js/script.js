@@ -16,11 +16,39 @@ const remainingGuessesSpan = document.querySelector(".remaining span");
 const message = document.querySelector(".message");
 // The hidden button that will appear prompting the player to play again.
 const hiddenButton = document.querySelector(".play-again hide");
+
 // Create another global variable called word and give it the value of "magnolia". 
 // Magnolia is your starting word to test out the game until you fetch words from a hosted file in a later step.
-const word = "magnolia";
+let word = "magnolia";
 // create a new global variable called 'guessedLetters' with an empty array
 const guessedLetters = [];
+// Create a global variable called remainingGuesses and set it to a value of 8
+let remainingGuesses = 8;
+
+// add an async function called getWord() to fetch data from a file (in this case a list of words)
+const getWord = async function () {
+	const fetchWords = await fetch (`https://gist.githubusercontent.com/skillcrush-curriculum/7061f1d4d3d5bfe47efbfbcfe42bf57e/raw/5ffc447694486e7dea686f34a6c085ae371b43fe/words.txt`);
+	// the data is being fetched from a text file rather than a JSON file so use .text() rather than .json().
+	const words = await fetchWords.text();
+	// Log out the data retrieved
+	console.log(words);
+	// transform the data into an array - the words are each seperated by a line break "\n", so this needs to be used as the 'delimiter'
+	// (the character to separate the words) when the 'split()' method is used.
+	const wordArray = words.split("\n")
+	console.log(wordArray);
+	// grab a random word index from the wordArray
+    const randomIndex = Math.floor(Math.random() * wordArray.length);
+    // pull out a random word and remove any extra whitespace using the 'trim()' method
+    // assign this random word to the global 'word' variable then change the declaration (at the top) from 'const' to 'let' so that it can change
+    word = wordArray[randomIndex].trim();
+    // 
+    console.log(word);
+    // call the 'placeholder' function, passing it the 'word' variable
+    placeHolder(word);
+};
+
+ // Start the game with a new word
+getWord();
 
 // Write a Function to Add Placeholders for Each Letter
 const placeHolder = function (word) {
@@ -37,11 +65,6 @@ wordInProgress.innerText = placeHolderLetters.join("");
 };
 
 
-// Call the function and pass it the word variable as the argument to change the placeholder letters on the screen.
-placeHolder(word);
-
-
-
 // Add an Event Listener for when a player clicks the guess Button
 // In the callback function, add a parameter for the event: e.
 	
@@ -55,7 +78,7 @@ placeHolder(word);
 	// Log out the value of the variable capturing the input.
 	console.log(guess);
 
-// create a variable that saves the successful return of the validateInput function
+// create a variable that saves the letter validated by the validateInput function
 const goodGuess = validateInput(guess);
 	console.log(goodGuess);
 
@@ -109,6 +132,7 @@ const makeGuess = function (guess) {
 		guessedLetters.push(guess);
 		console.log(guessedLetters);
 		showGuessedLetters();
+		countRemainingGuesses(guess);
 		updateWordInProgress(guessedLetters);
 		
 	}
@@ -149,13 +173,33 @@ const updateWordInProgress = function (guessedLetters) {
 		} else {
 			revealWord.push("●");
 		}
+	}
 	// use join() to update the empty paragraph where the word in progress will appear.
 	wordInProgress.innerText = revealWord.join("");
 	hasPlayerWon();
-	};
+	
 };
 // Call the function at the bottom of the else statement inside the makeGuess function and pass it guessedLetters as an argument.
 
+
+// Create a Function to Count Guesses Remaining
+const countRemainingGuesses = function (guess) {
+	const upperWord = word.toUpperCase();
+	if (!upperWord.includes(guess)) {
+		message.innerText = "Sorry that's a wrong guess";
+		remainingGuesses -= 1;
+	} else { 
+		message.innerText = `Well done! ${guess} is a good guess!`;
+	}
+
+	if (remainingGuesses === 0) {
+		message.innerHTML = `Game over! The word was <span class="highlight">${word}</span>.`;
+	} else if (remainingGuesses === 1) {
+		remainingGuessesSpan.innerText = `${remainingGuesses} guess`;
+	} else {
+		remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;
+	}
+};
 
 
 
@@ -166,13 +210,6 @@ const hasPlayerWon = function () {
 		message.innerHTML = `<p class="highlight">You guessed correct the word! Congrats!</p>`
 	} 
 }; 
-
-
-
-
-
-
-
 
 
 
